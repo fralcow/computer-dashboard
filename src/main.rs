@@ -1,4 +1,4 @@
-use cursive::views::{DummyView, LinearLayout, TextContent, TextContentRef, TextView};
+use cursive::views::{DummyView, LinearLayout, TextContent, TextView};
 use env_logger::{builder, Target};
 use log::debug;
 use std::sync::Arc;
