@@ -1,12 +1,17 @@
 use cursive::views::{LinearLayout, PaddedView, Panel, TextContent, TextView};
-use env_logger::{builder, Target};
+//use env_logger::{builder, Target};
+use chrono;
 use log::debug;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time;
 
 fn main() {
-    log_setup();
+    let result = setup_logger();
+    match result {
+        Err(e) => panic!("{}", e),
+        _ => (),
+    }
 
     let mut siv = cursive::default();
     siv.add_global_callback('q', |s| s.quit());
@@ -45,11 +50,23 @@ fn main() {
     siv.run();
 }
 
-fn log_setup() {
-    let mut builder = builder();
-    builder.target(Target::Stderr).init();
-
-    debug!["hello from main"];
+fn setup_logger() -> Result<(), fern::InitError> {
+    fern::Dispatch::new()
+        .format(|out, message, record| {
+            out.finish(format_args!(
+                "{}[{}][{}] {}",
+                chrono::Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
+                record.target(),
+                record.level(),
+                message
+            ))
+        })
+        .level(log::LevelFilter::Debug)
+        .level_for("cursive_core", log::LevelFilter::Error)
+        .chain(std::io::stderr())
+        .chain(fern::log_file("output.log")?)
+        .apply()?;
+    Ok(())
 }
 
 fn update_network_view_content(shared_content: Arc<Box<TextContent>>) {
