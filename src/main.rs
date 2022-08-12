@@ -111,6 +111,7 @@ fn beep_boop(input: bool) -> String {
 }
 
 fn update_storage_content(storage_content: Arc<Box<TextContent>>) {
+    //https://github.com/mfs/rust-df/blob/master/src/main.rs
     debug!["hello from udpate_storage_content"];
     let mut flipper = false;
 
