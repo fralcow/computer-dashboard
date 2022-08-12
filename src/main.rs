@@ -1,6 +1,5 @@
-use cursive::views::{LinearLayout, PaddedView, Panel, TextContent, TextView};
-//use env_logger::{builder, Target};
 use chrono;
+use cursive::views::{LinearLayout, PaddedView, Panel, TextContent, TextView};
 use log::debug;
 use std::sync::Arc;
 use std::thread::sleep;
