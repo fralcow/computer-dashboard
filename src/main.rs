@@ -19,7 +19,7 @@ fn main() {
     let info_content = TextView::new("Press q to quit");
     let info_view = prettify_text_view(info_content);
 
-    let storage_content = TextView::new("Hello from storage view!");
+    let storage_content = setup_storave_view();
     let storage_view = prettify_text_view(storage_content);
 
     let network_content = setup_network_view();
@@ -90,6 +90,37 @@ fn setup_network_view() -> cursive::views::TextView {
     std::thread::spawn(move || update_network_view_content(content_2.clone()));
 
     return network_view;
+}
+
+fn setup_storave_view() -> cursive::views::TextView {
+    let storage_content = TextContent::new("Hello from storage view!");
+    let storage_view = TextView::new_with_content(storage_content.clone());
+
+    let storage_content = Arc::new(Box::new(storage_content));
+    std::thread::spawn(move || update_storage_content(storage_content.clone()));
+
+    return storage_view;
+}
+
+fn beep_boop(input: bool) -> String {
+    if input {
+        return String::from("beep");
+    } else {
+        return String::from("boop");
+    };
+}
+
+fn update_storage_content(storage_content: Arc<Box<TextContent>>) {
+    debug!["hello from udpate_storage_content"];
+    let mut flipper = false;
+
+    loop {
+        debug!["Beep booper: {}", beep_boop(flipper)];
+
+        sleep(time::Duration::from_secs(1));
+        storage_content.set_content(format!("Storage view: {}", beep_boop(flipper)));
+        flipper = !flipper;
+    }
 }
 
 fn prettify_text_view(text_view: TextView) -> Panel<PaddedView<TextView>> {
