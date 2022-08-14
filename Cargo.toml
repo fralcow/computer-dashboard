@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 cursive = "0.19"
-tokio = { version = "1.20", features = ["full"] }
 log = "0.4"
 fern = "0.6"
 chrono = "0.4"
