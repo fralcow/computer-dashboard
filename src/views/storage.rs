@@ -33,4 +33,12 @@ fn beep_boop(input: bool) -> String {
     };
 }
 
+#[test]
+fn setup_storage_view() {
+    let storage_view = setup();
+    println!("Storage content: {}", storage_view.get_content().source());
+    assert!(storage_view
+        .get_content()
+        .source()
+        .contains("Storage view:"));
 }
