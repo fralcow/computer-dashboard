@@ -1,3 +1,4 @@
+use crate::beepboop::BeepBooper;
 use cursive::views::{TextContent, TextView};
 use std::sync::Arc;
 use std::thread::sleep;
@@ -16,21 +17,12 @@ pub fn setup() -> cursive::views::TextView {
 
 fn update_content(storage_content: Arc<Box<TextContent>>) {
     let msg = storage_content.get_content().source().to_owned();
-    let mut flipper = false;
+    let mut beeper = BeepBooper::new();
 
     loop {
         sleep(time::Duration::from_secs(1));
-        storage_content.set_content(format!("{}{}", msg, beep_boop(flipper)));
-        flipper = !flipper;
+        storage_content.set_content(format!("{}{}", msg, beeper.beep()));
     }
-}
-
-fn beep_boop(input: bool) -> String {
-    if input {
-        return String::from("beep");
-    } else {
-        return String::from("boop");
-    };
 }
 
 #[test]

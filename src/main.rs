@@ -1,6 +1,7 @@
 use crate::log::setup_logger;
 use crate::views::setup::setup_views;
 
+mod beepboop;
 mod log;
 mod views;
 
