@@ -83,3 +83,13 @@ fn get_network_stat(
 
     result
 }
+
+#[test]
+fn setup_network_view() {
+    let network_view = setup();
+    println!("Storage content: {}", network_view.get_content().source());
+    assert!(network_view
+        .get_content()
+        .source()
+        .contains("Network view:"));
+}
