@@ -1,5 +1,4 @@
 use cursive::views::{TextContent, TextView};
-use log::error;
 use procfs::net::DeviceStatus;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -18,70 +17,68 @@ pub fn setup() -> cursive::views::TextView {
 }
 
 fn update_content(network_content: Arc<Box<TextContent>>) {
-    let mut prev_stats = match procfs::net::dev_status() {
-        Ok(stats) => match Some(stats) {
-            Some(stats) => stats,
-            None => {
-                network_content.set_content(format!("Failed to initialize network view"));
-                return;
-            }
-        },
-        Err(e) => {
-            error!("{}", e);
-            network_content.set_content(format!("Failed to initialize network view"));
-            return;
-        }
-    };
-
-    let mut prev_now = std::time::Instant::now();
-
+    let mut network_stats_getter = new_stats_getter();
     loop {
         sleep(time::Duration::from_secs(1));
-
-        let now = std::time::Instant::now();
-        let dev_stats = procfs::net::dev_status().unwrap();
-
-        network_content.set_content(format!(
-            "{}",
-            get_network_stat(now, prev_now, prev_stats, &dev_stats)
-        ));
-
-        prev_stats = dev_stats;
-        prev_now = now;
+        network_content.set_content(format!("{}", network_stats_getter.get_stats()));
     }
 }
 
-fn get_network_stat(
-    now: std::time::Instant,
-    prev_now: std::time::Instant,
-    prev_stats: HashMap<String, DeviceStatus>,
-    dev_stats: &HashMap<String, DeviceStatus>,
-) -> String {
-    // calculate diffs from previous
-    let dt = (now - prev_now).as_millis() as f32 / 1000.0;
+type NetworkStats = HashMap<String, DeviceStatus>;
 
-    let mut stats: Vec<_> = dev_stats.values().collect();
-    stats.sort_by_key(|s| &s.name);
-    let mut result = format!(
-        "{:>16}: {:<20}               {:<20}\n",
-        "Interface", "bytes recv", "bytes sent"
-    );
-    result.push_str(&format!(
-        "{:>16}  {:<20}               {:<20}\n",
-        "================", "====================", "===================="
-    ));
-    for stat in stats {
+struct NetworkStatsGetter {
+    time: std::time::Instant,
+    stats: NetworkStats,
+}
+
+fn new_stats_getter() -> NetworkStatsGetter {
+    let dev_stats = procfs::net::dev_status().unwrap();
+
+    let nsg = NetworkStatsGetter {
+        time: std::time::Instant::now(),
+        stats: dev_stats,
+    };
+
+    nsg
+}
+
+impl NetworkStatsGetter {
+    fn get_stats(&mut self) -> String {
+        // calculate diffs from previous
+        let now = std::time::Instant::now();
+        let dt = (now - self.time).as_millis() as f32 / 1000.0;
+
+        let dev_status = procfs::net::dev_status().unwrap();
+        let mut stats: Vec<_> = dev_status.values().collect();
+
+        stats.sort_by_key(|s| &s.name);
+        let mut result = format!(
+            "{:>16}: {:<20}               {:<20}\n",
+            "Interface", "bytes recv", "bytes sent"
+        );
         result.push_str(&format!(
-            "{:>16}: {:<20}  {:>6.1} kbps  {:<20}  {:>6.1} kbps\n",
-            stat.name,
-            stat.recv_bytes,
-            (stat.recv_bytes - prev_stats.get(&stat.name).unwrap().recv_bytes) as f32 / dt / 1000.0,
-            stat.sent_bytes,
-            (stat.sent_bytes - prev_stats.get(&stat.name).unwrap().sent_bytes) as f32 / dt / 1000.0
+            "{:>16}  {:<20}               {:<20}\n",
+            "================", "====================", "===================="
         ));
-    }
+        for stat in stats {
+            result.push_str(&format!(
+                "{:>16}: {:<20}  {:>6.1} kbps  {:<20}  {:>6.1} kbps\n",
+                stat.name,
+                stat.recv_bytes,
+                (stat.recv_bytes - self.stats.get(&stat.name).unwrap().recv_bytes) as f32
+                    / dt
+                    / 1000.0,
+                stat.sent_bytes,
+                (stat.sent_bytes - self.stats.get(&stat.name).unwrap().sent_bytes) as f32
+                    / dt
+                    / 1000.0
+            ));
+        }
 
-    result
+        self.stats = dev_status;
+
+        result
+    }
 }
 
 #[test]
