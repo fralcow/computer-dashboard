@@ -14,7 +14,7 @@ pub fn setup_views() -> CursiveRunnable {
     let storage_view = prettify_text_view(storage_content);
 
     let network_content = network::setup();
-    let network_view = prettify_text_view(network_content);
+    let network_view = prettify_text_view(network_content).title("Network");
 
     let ram_content = TextView::new("Hello from ram view!");
     let ram_view = prettify_text_view(ram_content);
