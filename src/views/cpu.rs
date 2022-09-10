@@ -29,7 +29,7 @@ fn update_content(storage_content: Arc<Box<TextContent>>) {
             .map(|&record| format!("CPU{}: {:.2}%\n", record.0, record.1))
             .collect();
 
-        debug!("{}", cpu_usage);
+        debug!("\n{}", cpu_usage);
         storage_content.set_content(format!("{}", cpu_usage));
     }
 }
