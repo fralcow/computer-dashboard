@@ -1,3 +1,4 @@
+use ::log::error;
 use cursive::views::{TextContent, TextView};
 use procfs::net::DeviceStatus;
 use std::collections::HashMap;
@@ -17,7 +18,15 @@ pub fn setup() -> cursive::views::TextView {
 }
 
 fn update_content(network_content: Arc<Box<TextContent>>) {
-    let mut network_stats_getter = new_stats_getter();
+    let mut network_stats_getter = match new_stats_getter() {
+        Ok(nst) => nst,
+        Err(e) => {
+            error!("{}", e);
+            network_content.set_content(format!("Failed to initialize network widget"));
+            return;
+        }
+    };
+
     loop {
         sleep(time::Duration::from_secs(1));
         network_content.set_content(format!("{}", network_stats_getter.get_stats()));
@@ -31,22 +40,26 @@ struct NetworkStatsGetter {
     stats: NetworkStats,
 }
 
-fn new_stats_getter() -> NetworkStatsGetter {
-    let dev_stats = procfs::net::dev_status().unwrap();
-
-    let nsg = NetworkStatsGetter {
-        time: std::time::Instant::now(),
-        stats: dev_stats,
+fn new_stats_getter() -> Result<NetworkStatsGetter, &'static str> {
+    let dev_stats = match procfs::net::dev_status() {
+        Ok(stats) => Ok(stats),
+        _ => Err("some error"),
     };
 
-    nsg
+    match dev_stats {
+        Ok(s) => Ok(NetworkStatsGetter {
+            time: std::time::Instant::now(),
+            stats: s,
+        }),
+        Err(e) => Err(e),
+    }
 }
 
 impl NetworkStatsGetter {
     fn get_stats(&mut self) -> String {
         // calculate diffs from previous
         let now = std::time::Instant::now();
-        let dt = (now - self.time).as_millis() as f32 / 1000.0;
+        let time_delta = (now - self.time).as_millis() as f32 / 1000.0;
 
         let dev_status = procfs::net::dev_status().unwrap();
         let mut stats: Vec<_> = dev_status.values().collect();
@@ -66,11 +79,11 @@ impl NetworkStatsGetter {
                 stat.name,
                 stat.recv_bytes,
                 (stat.recv_bytes - self.stats.get(&stat.name).unwrap().recv_bytes) as f32
-                    / dt
+                    / time_delta
                     / 1000.0,
                 stat.sent_bytes,
                 (stat.sent_bytes - self.stats.get(&stat.name).unwrap().sent_bytes) as f32
-                    / dt
+                    / time_delta
                     / 1000.0
             ));
         }
