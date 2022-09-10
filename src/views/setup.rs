@@ -1,5 +1,5 @@
 use crate::views::{cpu, network, storage};
-use cursive::views::{LinearLayout, PaddedView, Panel, TextView};
+use cursive::views::{LinearLayout, PaddedView, Panel, ResizedView, TextView};
 use cursive::CursiveRunnable;
 
 pub fn setup_views() -> CursiveRunnable {
@@ -10,16 +10,16 @@ pub fn setup_views() -> CursiveRunnable {
     let info_view = prettify_text_view(info_content, String::from("Dashboard"), (0, 0, 0, 0));
 
     let storage_content = storage::setup();
-    let storage_view = prettify_text_view(storage_content, String::from("Storage"), (2, 2, 2, 2));
+    let storage_view = prettify_text_view(storage_content, String::from("Storage"), (1, 1, 0, 0));
 
     let network_content = network::setup();
-    let network_view = prettify_text_view(network_content, String::from("Network"), (2, 2, 2, 2));
+    let network_view = prettify_text_view(network_content, String::from("Network"), (1, 1, 0, 0));
 
     let ram_content = TextView::new("Hello from ram view!");
-    let ram_view = prettify_text_view(ram_content, String::from("Ram"), (2, 2, 2, 2));
+    let ram_view = prettify_text_view(ram_content, String::from("Ram"), (1, 1, 0, 0));
 
     let cpu_content = cpu::setup();
-    let cpu_view = prettify_text_view(cpu_content, String::from("Cpu"), (2, 2, 2, 2));
+    let cpu_view = prettify_text_view(cpu_content, String::from("Cpu"), (1, 1, 0, 0));
 
     let info_view = LinearLayout::vertical().child(info_view);
 
@@ -39,6 +39,7 @@ pub fn setup_views() -> CursiveRunnable {
     cursive_runnable
 }
 
+type PrettyView = Panel<ResizedView<PaddedView<TextView>>>;
 /// Converts a TextView into a padded view with the given margins
 ///
 /// # Arguments
@@ -52,11 +53,12 @@ fn prettify_text_view(
     text_view: TextView,
     title: String,
     margins: (usize, usize, usize, usize),
-) -> Panel<PaddedView<TextView>> {
+) -> PrettyView {
     let view = PaddedView::new(
         cursive::view::Margins::lrtb(margins.0, margins.1, margins.2, margins.2),
         text_view,
     );
+    let view = ResizedView::with_max_height(12, view);
     let mut view = Panel::new(view);
     view.set_title(title);
 
