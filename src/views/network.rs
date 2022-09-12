@@ -18,7 +18,7 @@ pub fn setup() -> cursive::views::TextView {
 }
 
 fn update_content(network_content: Arc<Box<TextContent>>) {
-    let mut network_stats_getter = match new_stats_getter() {
+    let mut network_stats_getter = match new() {
         Ok(nst) => nst,
         Err(e) => {
             error!("{}", e);
@@ -29,7 +29,7 @@ fn update_content(network_content: Arc<Box<TextContent>>) {
 
     loop {
         sleep(time::Duration::from_secs(1));
-        network_content.set_content(format!("{}", network_stats_getter.get_stats()));
+        network_content.set_content(format!("{}", network_stats_getter.get()));
     }
 }
 
@@ -38,7 +38,7 @@ struct NetworkStatsGetter {
     stats: HashMap<String, DeviceStatus>,
 }
 
-fn new_stats_getter() -> Result<NetworkStatsGetter, &'static str> {
+fn new() -> Result<NetworkStatsGetter, &'static str> {
     let dev_stats = match procfs::net::dev_status() {
         Ok(stats) => Ok(stats),
         _ => Err("some error"),
@@ -54,7 +54,7 @@ fn new_stats_getter() -> Result<NetworkStatsGetter, &'static str> {
 }
 
 impl NetworkStatsGetter {
-    fn get_stats(&mut self) -> String {
+    fn get(&mut self) -> String {
         // calculate diffs from previous
         let now = std::time::Instant::now();
         let time_delta = (now - self.time).as_millis() as f32 / 1000.0;
