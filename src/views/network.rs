@@ -35,7 +35,7 @@ fn update_content(network_content: Arc<Box<TextContent>>) {
 
 struct NetworkStatsGetter {
     time: std::time::Instant,
-    stats: HashMap<String, DeviceStatus>,
+    device_statuses: HashMap<String, DeviceStatus>,
 }
 
 fn new() -> Result<NetworkStatsGetter, &'static str> {
@@ -47,7 +47,7 @@ fn new() -> Result<NetworkStatsGetter, &'static str> {
     match dev_stats {
         Ok(s) => Ok(NetworkStatsGetter {
             time: std::time::Instant::now(),
-            stats: s,
+            device_statuses: s,
         }),
         Err(e) => Err(e),
     }
@@ -76,17 +76,17 @@ impl NetworkStatsGetter {
                 "{:>16}: {:<20}  {:>6.1} kbps  {:<20}  {:>6.1} kbps\n",
                 stat.name,
                 stat.recv_bytes,
-                (stat.recv_bytes - self.stats.get(&stat.name).unwrap().recv_bytes) as f32
+                (stat.recv_bytes - self.device_statuses.get(&stat.name).unwrap().recv_bytes) as f32
                     / time_delta
                     / 1000.0,
                 stat.sent_bytes,
-                (stat.sent_bytes - self.stats.get(&stat.name).unwrap().sent_bytes) as f32
+                (stat.sent_bytes - self.device_statuses.get(&stat.name).unwrap().sent_bytes) as f32
                     / time_delta
                     / 1000.0
             ));
         }
 
-        self.stats = dev_status;
+        self.device_statuses = dev_status;
 
         result
     }
