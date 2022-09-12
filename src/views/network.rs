@@ -33,11 +33,9 @@ fn update_content(network_content: Arc<Box<TextContent>>) {
     }
 }
 
-type NetworkStats = HashMap<String, DeviceStatus>;
-
 struct NetworkStatsGetter {
     time: std::time::Instant,
-    stats: NetworkStats,
+    stats: HashMap<String, DeviceStatus>,
 }
 
 fn new_stats_getter() -> Result<NetworkStatsGetter, &'static str> {
