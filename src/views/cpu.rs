@@ -17,14 +17,13 @@ pub fn setup() -> cursive::views::TextView {
     return cpu_view;
 }
 
-//println!("cpu pressure: {:#?}", procfs::CpuPressure::new());
 fn update_content(storage_content: Arc<Box<TextContent>>) {
-    let mut cpu_monitor = new_cpu_monitor();
+    let mut cpu_monitor = new();
     loop {
         sleep(time::Duration::from_secs(1));
 
         let cpu_usage: String = cpu_monitor
-            .get_cpu_usage()
+            .get()
             .iter()
             .map(|&record| format!("CPU{}: {:.2}%\n", record.0, record.1))
             .collect();
@@ -34,12 +33,12 @@ fn update_content(storage_content: Arc<Box<TextContent>>) {
     }
 }
 
-struct CpuMonitor {
+struct CpuStatsGetter {
     cpus: HashMap<usize, CPU>,
 }
 
-impl CpuMonitor {
-    fn get_cpu_usage(&mut self) -> Vec<(usize, f32)> {
+impl CpuStatsGetter {
+    fn get(&mut self) -> Vec<(usize, f32)> {
         let mut result: Vec<(usize, f32)> = Vec::new();
 
         let new_cpus = ProcStat::read().cpus;
@@ -64,9 +63,9 @@ impl CpuMonitor {
     }
 }
 
-fn new_cpu_monitor() -> CpuMonitor {
+fn new() -> CpuStatsGetter {
     let cpus = ProcStat::read().cpus;
-    CpuMonitor { cpus }
+    CpuStatsGetter { cpus }
 }
 
 fn total_cpu_time(cpu: &CPU) -> u64 {
