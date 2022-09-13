@@ -1,4 +1,4 @@
-use crate::views::{cpu, network, storage};
+use crate::views::{cpu, memory, network, storage};
 use cursive::views::{LinearLayout, PaddedView, Panel, ResizedView, TextView};
 use cursive::CursiveRunnable;
 
@@ -15,8 +15,8 @@ pub fn setup_views() -> CursiveRunnable {
     let network_content = network::setup();
     let network_view = prettify_text_view(network_content, String::from("Network"), (1, 1, 0, 0));
 
-    let ram_content = TextView::new("Hello from ram view!");
-    let ram_view = prettify_text_view(ram_content, String::from("Ram"), (1, 1, 0, 0));
+    let ram_content = memory::setup();
+    let ram_view = prettify_text_view(ram_content, String::from("Memory"), (1, 1, 0, 0));
 
     let cpu_content = cpu::setup();
     let cpu_view = prettify_text_view(cpu_content, String::from("Cpu"), (1, 1, 0, 0));
