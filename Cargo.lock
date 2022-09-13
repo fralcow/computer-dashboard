@@ -88,6 +88,7 @@ dependencies = [
  "fern",
  "log",
  "procfs",
+ "procstat",
 ]
 
 [[package]]
@@ -536,6 +537,12 @@ dependencies = [
  "lazy_static",
  "rustix",
 ]
+
+[[package]]
+name = "procstat"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a2fc89593746e7fd101d9e1173e2cacaecf344fe236660126d6f23e3a25ab44"
 
 [[package]]
 name = "quote"
