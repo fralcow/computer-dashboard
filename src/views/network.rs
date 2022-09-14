@@ -28,11 +28,11 @@ fn update_content(network_content: Arc<Box<TextContent>>) {
     };
 
     loop {
-        sleep(time::Duration::from_secs(1));
-
         let network_stats = network_stats_getter.get();
         debug!("\n{}", network_stats);
         network_content.set_content(format!("{}", network_stats));
+
+        sleep(time::Duration::from_secs(1));
     }
 }
 

@@ -17,8 +17,6 @@ pub fn setup() -> cursive::views::TextView {
 
 fn update_content(memory_content: Arc<Box<TextContent>>) {
     loop {
-        sleep(time::Duration::from_secs(1));
-
         let meminfo = Meminfo::new().unwrap();
         let mem_total_mb = meminfo.mem_total / 1024 / 1024;
         let mem_free_mb = meminfo.mem_available.unwrap() / 1024 / 1024;
@@ -35,5 +33,7 @@ fn update_content(memory_content: Arc<Box<TextContent>>) {
 
         debug!("{}", display_string);
         memory_content.set_content(display_string);
+
+        sleep(time::Duration::from_secs(1));
     }
 }

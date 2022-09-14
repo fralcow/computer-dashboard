@@ -20,8 +20,8 @@ fn update_content(storage_content: Arc<Box<TextContent>>) {
     let mut beeper = BeepBooper::new();
 
     loop {
-        sleep(time::Duration::from_secs(1));
         storage_content.set_content(format!("{}{}", msg, beeper.beep()));
+        sleep(time::Duration::from_secs(1));
     }
 }
 

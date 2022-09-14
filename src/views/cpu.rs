@@ -20,8 +20,6 @@ pub fn setup() -> cursive::views::TextView {
 fn update_content(storage_content: Arc<Box<TextContent>>) {
     let mut cpu_monitor = new();
     loop {
-        sleep(time::Duration::from_secs(1));
-
         let cpu_usage: String = cpu_monitor
             .get()
             .iter()
@@ -30,6 +28,8 @@ fn update_content(storage_content: Arc<Box<TextContent>>) {
 
         debug!("\n{}", cpu_usage);
         storage_content.set_content(format!("{}", cpu_usage));
+
+        sleep(time::Duration::from_secs(1));
     }
 }
 
