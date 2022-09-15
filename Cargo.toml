@@ -11,6 +11,8 @@ fern = "0.6"
 chrono = "0.4"
 procfs = "0.14"
 procstat = "1"
+nix = "0.18"
+fstab = "0.4"
 
 [dependencies.cursive]
 version = "0.19.0"
