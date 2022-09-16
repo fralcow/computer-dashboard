@@ -6,6 +6,16 @@ pub fn setup_views() -> CursiveRunnable {
     let mut cursive_runnable = cursive::default();
     cursive_runnable.add_global_callback('q', |s| s.quit());
 
+    let mut theme = cursive::theme::load_default();
+    theme
+        .palette
+        .set_color("title_primary", cursive::theme::Color::Rgb(24, 24, 24));
+    cursive_runnable.set_theme(theme);
+
+    //.current_theme()
+    //.palette
+    //.set_color("title_primary", cursive::theme::Color::Rgb(46, 45, 56));
+
     let info_content = TextView::new("Press q to quit");
     let info_view = prettify_text_view(info_content, String::from("Dashboard"), (0, 0, 0, 0));
 
@@ -40,6 +50,7 @@ pub fn setup_views() -> CursiveRunnable {
 }
 
 type PrettyView = Panel<ResizedView<PaddedView<TextView>>>;
+
 /// Converts a TextView into a padded view with the given margins
 ///
 /// # Arguments
