@@ -1,6 +1,7 @@
 # computer dashboard
 
-A glances-like dashboard for a linux computer
+A [glances-like](https://github.com/nicolargo/glances) dashboard for a linux computer
+![Dashboard screenshot](/assets/comp-dash.png)
 
 # How to run
 1. Clone the repo
@@ -8,3 +9,6 @@ A glances-like dashboard for a linux computer
 
 To run with debug level log, use: `LOG_LEVEL=debug cargo run`.
 Logs will be written to `output.log` file.
+
+# Limitations
+Only runs on linux, due to the limitations of the libraries used.
